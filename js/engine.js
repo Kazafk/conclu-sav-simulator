@@ -622,7 +622,7 @@
       (function (ch, idx) {
         setTimeout(function () {
           var span = document.createElement("span");
-          span.textContent = ch === " " ? " " : ch;
+          span.textContent = ch === " " ? " " : ch;
           span.className = "drop";
           holder.appendChild(span);
         }, 700 + idx * 130);
