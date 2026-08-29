@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#2b2d42">
+  <title>CONCLU ! — Le Jeu du SAV</title>
+  <meta name="description" content="Visual novel comique façon Ace Attorney : survivez aux appels du SAV et concluez la vente !">
+  <!-- Google Fonts (le jeu fonctionne hors-ligne avec fallback monospace) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-office accent-gold">
+
+  <!-- ══════════ EFFET CRT GLOBAL ══════════ -->
+  <div id="crt-overlay" aria-hidden="true"></div>
+
+  <!-- Bouton mute global -->
+  <button id="btn-mute" class="btn-icon" title="Son ON/OFF" aria-label="Activer ou couper le son">🔊</button>
+
+  <!-- ══════════ 1. ÉCRAN TITRE ══════════ -->
+  <section id="screen-title" class="screen active">
+    <div class="title-office-decor" aria-hidden="true">
+      <div class="deco-window"></div>
+      <div class="deco-plant">🪴</div>
+    </div>
+    <div class="title-inner">
+      <div class="title-phone" aria-hidden="true">
+        <span class="title-phone-emoji">☎️</span>
+        <span class="ring-wave w1"></span>
+        <span class="ring-wave w2"></span>
+        <span class="ring-wave w3"></span>
+      </div>
+      <h1 class="game-logo"><span class="logo-conclu">CONCLU&nbsp;!</span></h1>
+      <p class="game-subtitle">— Le Jeu du SAV —</p>
+      <nav class="title-menu">
+        <button id="btn-new-game" class="btn-pixel btn-big">▶ NOUVELLE PARTIE</button>
+        <button id="btn-continue" class="btn-pixel btn-big hidden">📞 CONTINUER</button>
+        <button id="btn-wardrobe" class="btn-pixel">👔 VESTIAIRE</button>
+        <button id="btn-credits" class="btn-pixel">📜 CRÉDITS</button>
+      </nav>
+      <p id="title-level" class="title-level"></p>
+    </div>
+  </section>
+
+  <!-- ══════════ 2. ÉCRAN BRIEFING ══════════ -->
+  <section id="screen-briefing" class="screen">
+    <div class="panel briefing-panel">
+      <h2 id="briefing-day-title" class="panel-title"></h2>
+      <div class="briefing-stars" id="briefing-stars" aria-label="Difficulté"></div>
+      <p id="briefing-text" class="briefing-text"></p>
+
+      <div class="objective-card">
+        <h3>🎯 OBJECTIF DE VENTE</h3>
+        <p class="objective-name" id="objective-name"></p>
+        <p class="objective-desc" id="objective-desc"></p>
+        <p class="objective-price" id="objective-price"></p>
+      </div>
+
+      <div class="briefing-client">
+        <div id="briefing-portrait" class="portrait-frame frame-basic">
+          <span id="briefing-emoji" class="portrait-emoji"></span>
+        </div>
+        <div class="briefing-client-id">
+          <p id="briefing-client-name" class="client-name"></p>
+          <p id="briefing-client-subtitle" class="client-subtitle"></p>
+        </div>
+      </div>
+
+      <div class="briefing-actions">
+        <button id="btn-answer" class="btn-pixel btn-big btn-green">📞 DÉCROCHER</button>
+        <button id="btn-briefing-back" class="btn-pixel btn-small">↩ MENU</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 3. ÉCRAN D'APPEL (cœur du jeu) ══════════ -->
+  <section id="screen-call" class="screen">
+    <!-- Bandeau client -->
+    <header id="call-header">
+      <div id="call-portrait" class="portrait-frame frame-basic">
+        <span id="call-emoji" class="portrait-emoji"></span>
+      </div>
+      <div class="call-client-info">
+        <p id="call-client-name" class="client-name"></p>
+        <p id="call-client-subtitle" class="client-subtitle"></p>
+      </div>
+      <div class="online-badge"><span class="online-dot"></span>EN&nbsp;LIGNE</div>
+    </header>
+
+    <!-- Barres de stats -->
+    <div id="stats-bars">
+      <div class="stat-row" id="stat-confiance">
+        <span class="stat-label">CONFIANCE</span>
+        <div class="stat-bar"><div class="stat-fill fill-confiance"></div><span class="stat-flash"></span></div>
+        <span class="stat-value">0</span>
+      </div>
+      <div class="stat-row" id="stat-interet">
+        <span class="stat-label">INTÉRÊT</span>
+        <div class="stat-bar"><div class="stat-fill fill-interet"></div><span class="stat-flash"></span></div>
+        <span class="stat-value">0</span>
+      </div>
+      <div class="stat-row" id="stat-agacement">
+        <span class="stat-label">AGACEMENT</span>
+        <div class="stat-bar"><div class="stat-fill fill-agacement"></div><span class="stat-flash"></span></div>
+        <span class="stat-value">0</span>
+      </div>
+    </div>
+
+    <!-- Décor de bureau -->
+    <div id="call-scene" aria-hidden="true">
+      <div class="deco-window"></div>
+      <div class="deco-plant">🪴</div>
+      <div class="deco-phone">☎️</div>
+      <div class="deco-gilbert" id="deco-gilbert">🧑‍💼</div>
+    </div>
+
+    <!-- Boutons latéraux -->
+    <div id="call-side-buttons">
+      <button id="btn-notebook" class="btn-pixel btn-side">📓 CARNET <span id="notebook-count" class="badge hidden">0</span></button>
+      <button id="btn-sell" class="btn-pixel btn-side btn-sell hidden">💼 PROPOSER LA VENTE</button>
+    </div>
+
+    <!-- Zone de dialogue -->
+    <div id="dialogue-box">
+      <div id="dialogue-speaker" class="speaker-narrator">???</div>
+      <p id="dialogue-text"></p>
+      <span id="dialogue-next-hint" class="hidden">▼</span>
+    </div>
+
+    <!-- Choix -->
+    <div id="choices-container"></div>
+  </section>
+
+  <!-- ══════════ PANNEAU CARNET (coulissant) ══════════ -->
+  <aside id="panel-notebook" aria-hidden="true">
+    <div class="notebook-head">
+      <h3>📓 CARNET D'INDICES</h3>
+      <button id="btn-notebook-close" class="btn-pixel btn-small">✖</button>
+    </div>
+    <ul id="notebook-list"></ul>
+    <p id="notebook-empty">Aucun indice collecté pour l'instant.<br>Écoutez bien votre client…</p>
+  </aside>
+  <div id="notebook-backdrop" class="hidden"></div>
+
+  <!-- ══════════ 4. VESTIAIRE ══════════ -->
+  <section id="screen-wardrobe" class="screen">
+    <div class="panel wardrobe-panel">
+      <h2 class="panel-title">👔 VESTIAIRE</h2>
+      <p id="wardrobe-level" class="wardrobe-level"></p>
+      <div id="wardrobe-categories"></div>
+      <div class="briefing-actions">
+        <button id="btn-wardrobe-back" class="btn-pixel">↩ RETOUR</button>
+        <button id="btn-reset-save" class="btn-pixel btn-small btn-danger">🗑 RÉINITIALISER</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 5. CRÉDITS ══════════ -->
+  <section id="screen-credits" class="screen">
+    <div class="panel credits-panel">
+      <h2 class="panel-title">📜 CRÉDITS</h2>
+      <div class="credits-body">
+        <p><strong>CONCLU ! — Le Jeu du SAV</strong></p>
+        <p>Un visual novel comique du service après-vente.</p>
+        <p>Inspiré avec amour par Ace Attorney™ et par tous les téléconseillers qui rêvent de raccrocher les premiers.</p>
+        <p>Moteur : HTML/CSS/JS vanilla — 100% hors-ligne.<br>Sons : WebAudio généré en direct.<br>Pixel-art : pur CSS.</p>
+        <p class="credits-tip">⌨️ Astuces clavier :<br><kbd>1</kbd>–<kbd>4</kbd> choix · <kbd>Espace</kbd>/<kbd>Entrée</kbd> avancer</p>
+        <label class="crt-toggle"><input type="checkbox" id="toggle-crt" checked> Effet scanlines CRT</label>
+      </div>
+      <div class="briefing-actions">
+        <button id="btn-credits-back" class="btn-pixel">↩ RETOUR</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 6. OVERLAY FIN (victoire / défaite) ══════════ -->
+  <div id="overlay-ending" class="hidden" aria-hidden="true">
+    <div id="ending-flash"></div>
+    <div id="ending-stamp" class="hidden">VENTE<br>CONCLUE&nbsp;!</div>
+    <div id="ending-lost" class="hidden"></div>
+    <div id="confetti-container"></div>
+
+    <div id="ending-result" class="panel hidden">
+      <h2 id="ending-result-title" class="panel-title"></h2>
+      <p id="ending-result-sub"></p>
+      <div id="ending-xp" class="ending-xp hidden">
+        <p>XP GAGNÉ : <strong id="ending-xp-value"></strong></p>
+        <p>NIVEAU : <strong id="ending-level-name"></strong></p>
+        <div class="xp-bar"><div id="xp-fill"></div></div>
+        <p id="ending-unlocks" class="ending-unlocks"></p>
+      </div>
+      <div class="briefing-actions" id="ending-buttons">
+        <button id="btn-next-day" class="btn-pixel btn-big btn-green hidden">⏭ JOUR SUIVANT</button>
+        <button id="btn-replay" class="btn-pixel">🔁 REJOUER</button>
+        <button id="btn-ending-menu" class="btn-pixel">🏠 MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast générique (lockedText, notifications) -->
+  <div id="toast" class="hidden" role="status"></div>
+
+  <!-- Scripts classiques (pas de modules : doit tourner en file://) -->
+  <script src="js/audio.js"></script>
+  <script src="js/scenarios.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>
